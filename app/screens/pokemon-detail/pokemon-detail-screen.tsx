@@ -1,5 +1,6 @@
-import React, { FC } from "react"
-import { ImageStyle, Pressable, TextStyle, View, ViewStyle, } from "react-native"
+/* eslint-disable react-native/split-platform-components */
+import React, { FC, useEffect } from "react"
+import { ImageStyle, Pressable, TextStyle, ToastAndroid, View, ViewStyle, } from "react-native"
 import { StackScreenProps } from "@react-navigation/stack"
 import { observer } from "mobx-react-lite"
 import {
@@ -8,6 +9,9 @@ import {
 } from "../../components"
 import { NavigatorParamList } from "../../navigators"
 import { ScrollView } from "react-native-gesture-handler"
+import { useStores } from "../../models"
+import { PokemonDetail } from "../../models/pokemon/pokemon-detail"
+import { isEmpty } from "validate.js"
 
 
 
@@ -18,49 +22,73 @@ const TYPE: ViewStyle = { backgroundColor: "black", padding: 16, margin: 8, bord
 const TEXT_TYPE: TextStyle = { color: "white", }
 const DETAIL: ViewStyle = { backgroundColor: "white", borderRadius: 16, padding: 16 }
 
-const MORTY = { uri: "https://rickandmortyapi.com/api/character/avatar/2.jpeg" }
 const POKE_BALL = { uri: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Pokeball.png" }
 const IMAGE: ImageStyle = { height: 80, width: 80, alignSelf: "center" }
-const BALL_CONTAINER: ViewStyle = { position: "absolute", elevation: 2, bottom: 0, alignSelf: "center"  }
+const BALL_CONTAINER: ViewStyle = { position: "absolute", elevation: 2, bottom: 0, alignSelf: "center" }
 
 export const PokemonDetailScreen: FC<StackScreenProps<NavigatorParamList, "pokemonDetail">> = observer(
-  ({ navigation }) => {
+  ({ route }) => {
+
+    const { pokemonStore } = useStores()
+
+    const { pokemon } = route.params;
+
+    const [detail, setPokemonDetail] = React.useState({ pokemonDetail: {} as PokemonDetail })
+
+    const showToast = () => {
+      pokemonStore.addPokebag(pokemon)
+      if(isEmpty(pokemonStore.error)) return;
+      ToastAndroid.show(pokemonStore.error, ToastAndroid.SHORT);
+    };
+
+
+    useEffect(() => {
+      async function fetchData() {
+        const result = await pokemonStore.getDetailPokemon(pokemon.id)
+        setPokemonDetail({ pokemonDetail: result })
+      }
+      fetchData()
+    }, [])
+
+    const getImageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`
+
+    // console.log(pokemonStore.pokebag)
 
     return (
       <View style={SCAFFOLD}>
         <View style={PADDING} />
         <ScrollView scrollEnabled>
-          <Text preset="header" >Bulbasaur</Text>
+          <Text preset="header" >{pokemon.name}</Text>
           <View style={PADDING} />
           <View style={TYPE_CONTAINER} >
-            {[1, 1].map((e, index) => {
+            {(detail?.pokemonDetail?.types ?? []).map((e, index) => {
               return (
                 <View key={index} style={TYPE} >
-                  <Text preset="header" style={TEXT_TYPE} >poison</Text>
+                  <Text preset="header" style={TEXT_TYPE} >{e?.type?.name ?? ""}</Text>
                 </View>
               )
             })}
           </View>
           <View style={PADDING} />
-          <AutoImage source={MORTY} style={IMAGE}  ></AutoImage>
+          <AutoImage source={{ uri: getImageUrl }} style={IMAGE}  ></AutoImage>
           <View style={PADDING} />
           <View style={DETAIL} >
             <Text preset="header">Atributtes</Text>
             <View style={TYPE_CONTAINER} >
-              {[1, 1, 1, 1, 1, 11, 1, 1, 1, 1,].map((e, index) => {
+              {(detail?.pokemonDetail?.abilities ?? []).map((e, index) => {
                 return (
                   <View key={index} style={TYPE} >
-                    <Text preset="header" style={TEXT_TYPE} >poison</Text>
+                    <Text preset="header" style={TEXT_TYPE} >{e?.ability?.name ?? ""}</Text>
                   </View>
                 )
               })}
             </View>
             <Text preset="header">Moves</Text>
             <View style={TYPE_CONTAINER} >
-              {[1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1,].map((e, index) => {
+              {(detail.pokemonDetail.moves ?? []).map((e, index) => {
                 return (
                   <View key={index} style={TYPE} >
-                    <Text preset="header" style={TEXT_TYPE} >poison</Text>
+                    <Text preset="header" style={TEXT_TYPE} >{e?.move?.name ?? ""}</Text>
                   </View>
                 )
               })}
@@ -68,7 +96,10 @@ export const PokemonDetailScreen: FC<StackScreenProps<NavigatorParamList, "pokem
           </View>
         </ScrollView>
         <View style={BALL_CONTAINER}>
+          <Pressable onPress={showToast}>
           <AutoImage source={POKE_BALL} style={IMAGE}></AutoImage>
+
+          </Pressable>
         </View>
       </View>
     )

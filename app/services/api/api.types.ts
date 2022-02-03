@@ -1,3 +1,4 @@
+import { PokemonDetail } from './../../models/pokemon/pokemon-detail';
 import { GeneralApiProblem } from "./api-problem"
 import { Character } from "../../models/character/character"
 import { Pokemon } from "../../models/pokemon/pokemon"
@@ -14,4 +15,4 @@ export type GetCharactersResult = { kind: "ok"; characters: Character[] } | Gene
 export type GetCharacterResult = { kind: "ok"; character: Character } | GeneralApiProblem
 
 export type GetPokemonsResult = { kind: "ok"; pokemons: Pokemon[] } | GeneralApiProblem
-export type GetPokemonResult = { kind: "ok"; pokemon: Pokemon } | GeneralApiProblem
+export type GetPokemonDetailResult = { kind: "ok"; pokemonDetail: PokemonDetail } | GeneralApiProblem

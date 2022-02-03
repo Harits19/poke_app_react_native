@@ -10,6 +10,7 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { DemoScreen, DemoListScreen, PokemonDetailScreen, PokebagScreen, PokemonScreen } from "../screens"
 import { navigationRef, useBackButtonHandler } from "./navigation-utilities"
+import { Pokemon } from "../models/pokemon/pokemon"
 
 /**
  * This type allows TypeScript to know what routes are defined in this navigator
@@ -28,7 +29,7 @@ export type NavigatorParamList = {
   demo: undefined
   demoList: undefined
   pokemon: undefined
-  pokemonDetail: undefined
+  pokemonDetail: {pokemon: Pokemon}
   pokebag: undefined
 
 

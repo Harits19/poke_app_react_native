@@ -15,14 +15,17 @@ const ICON: TextStyle = { fontSize: 40, alignSelf: "flex-start" }
 const HEADER: ViewStyle = { flexDirection: "row-reverse", justifyContent: "space-between" }
 
 export function ItemPokemon(props: ItemPokemonProps) {
-  const { onPress, onPressDelete } = props;
+  const { onPress, onPressDelete, pokemon, } = props
 
+
+
+  const getImageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`
 
   return (
     <Pressable onPress={onPress}  >
       <View style={ITEM_CONTAINER} >
-        <Text preset="header">Bulbasaur</Text>
-        <AutoImage source={MORTY} style={IMAGE}  ></AutoImage>
+        <Text preset="header">{pokemon.name ?? ""}</Text>
+        {pokemon && <AutoImage source={{ uri: getImageUrl}} style={IMAGE}  ></AutoImage>}
         {onPressDelete && <Icon
           onPress={onPressDelete}
           name='delete'
